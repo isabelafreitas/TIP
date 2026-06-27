@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 const { testConnection } = require('./src/config/database');
-const { setupWebSocket } = require('./src/websocket/chat.ws');
+const { attachWebSocket } = require('./src/websocket/chat.ws');
 
 // Routes
 const authRoutes = require('./src/routes/auth.routes');
@@ -22,6 +22,11 @@ const chatRoutes = require('./src/routes/chat.routes');
 const savedRoutes = require('./src/routes/saved.routes');
 
 // Cron jobs
+const { startEscrowJob } = require('./src/jobs/escrow.job');
+const { startReviewsJob } = require('./src/jobs/reviews.job');
+const { startAnnouncementsJob } = require('./src/jobs/announcements.job');
+const { startNonAttendanceJob } = require('./src/jobs/nonattendance.job');
+const { startCancellationsJob } = require('./src/jobs/cancellations.job');
 const { startExpireAnnouncementsJob } = require('./src/jobs/expireAnnouncements.job');
 const { startAutoReleasePaymentsJob } = require('./src/jobs/autoReleasePayments.job');
 const { startExpireReviewsJob } = require('./src/jobs/expireReviews.job');
@@ -30,32 +35,39 @@ const { startCleanupSessionsJob } = require('./src/jobs/cleanupSessions.job');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(helmet());
+
+// CORS: allow all origins in dev, restrict in production
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true,
+  origin: NODE_ENV === 'production'
+    ? (process.env.FRONTEND_URL || 'http://localhost:3001')
+    : '*',
+  credentials: NODE_ENV === 'production',
 }));
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: '1', timestamp: new Date().toISOString() });
 });
 
-// ── API Routes ────────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
-app.use('/api/users', usersRoutes);
-app.use('/api/providers', providersRoutes);
-app.use('/api/announcements', announcementsRoutes);
-app.use('/api/services', servicesRoutes);
-app.use('/api/payments', paymentsRoutes);
-app.use('/api/disputes', disputesRoutes);
-app.use('/api/reviews', reviewsRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/saved', savedRoutes);
+// ── API v1 Routes ─────────────────────────────────────────────────────────────
+const API = '/api/v1';
+app.use(`${API}/auth`, authRoutes);
+app.use(`${API}/users`, usersRoutes);
+app.use(`${API}/providers`, providersRoutes);
+app.use(`${API}/announcements`, announcementsRoutes);
+app.use(`${API}/services`, servicesRoutes);
+app.use(`${API}/payments`, paymentsRoutes);
+app.use(`${API}/disputes`, disputesRoutes);
+app.use(`${API}/reviews`, reviewsRoutes);
+app.use(`${API}/chat`, chatRoutes);
+app.use(`${API}/saved`, savedRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -70,15 +82,24 @@ app.use((err, req, res, next) => {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 async function boot() {
-  await testConnection();
+  try {
+    await testConnection();
+  } catch (dbErr) {
+    console.warn('[Boot] Database connection failed (continuing without DB):', dbErr.message);
+  }
 
   const server = http.createServer(app);
 
-  // WebSocket
-  const wss = setupWebSocket(server);
-  app.locals.wss = wss;
+  // Attach WebSocket
+  const chatWs = attachWebSocket(server);
+  app.locals.chatWs = chatWs;
 
   // Start scheduled jobs
+  startEscrowJob();
+  startReviewsJob();
+  startAnnouncementsJob();
+  startNonAttendanceJob();
+  startCancellationsJob();
   startExpireAnnouncementsJob();
   startAutoReleasePaymentsJob();
   startExpireReviewsJob();
@@ -86,8 +107,10 @@ async function boot() {
   startCleanupSessionsJob();
 
   server.listen(PORT, () => {
-    console.log(`TIP backend running on http://localhost:${PORT}`);
-    console.log(`WebSocket ready on ws://localhost:${PORT}/ws`);
+    console.log(`\n🚀 TIP backend running on http://localhost:${PORT}`);
+    console.log(`   API: http://localhost:${PORT}/api/v1`);
+    console.log(`   WS:  ws://localhost:${PORT}/ws`);
+    console.log(`   ENV: ${NODE_ENV}\n`);
   });
 }
 

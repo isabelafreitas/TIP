@@ -1,18 +1,33 @@
 const WebSocket = require('ws');
 const { verify } = require('../config/jwt');
-const chatService = require('../services/chat.service');
+const { pool } = require('../config/database');
 
 /**
  * Map of sessionId -> Set of WebSocket clients
- * Used to broadcast messages to all participants in a chat session.
  */
 const sessionClients = new Map();
 
-function setupWebSocket(server) {
+function broadcastToSession(sessionId, data) {
+  const clients = sessionClients.get(sessionId);
+  if (!clients) return;
+  const message = JSON.stringify(data);
+  for (const client of clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+/**
+ * Attach WebSocket server to the HTTP server.
+ * Connection URL: ws://host/ws?token=JWT&sessionId=SESSION_ID
+ * @param {import('http').Server} server
+ * @returns {{ broadcastToSession: Function }}
+ */
+function attachWebSocket(server) {
   const wss = new WebSocket.Server({ server, path: '/ws' });
 
   wss.on('connection', async (ws, req) => {
-    // Authenticate via query string token: /ws?token=<jwt>
     const url = new URL(req.url, `http://${req.headers.host}`);
     const token = url.searchParams.get('token');
     const sessionId = url.searchParams.get('sessionId');
@@ -31,15 +46,24 @@ function setupWebSocket(server) {
       return;
     }
 
-    // Verify user can access this session
+    // Verify user has access to this session
     try {
-      await chatService.getMessages(sessionId, userId, { page: 1, limit: 1 });
-    } catch {
-      ws.close(4003, 'Acesso negado à sessão');
+      const { rows } = await pool.query(
+        `SELECT cs.id FROM chat_sessions cs
+         JOIN services s ON s.id = cs.service_id
+         WHERE cs.id = $1 AND (s.requester_id = $2 OR s.provider_id = $2)`,
+        [sessionId, userId]
+      );
+      if (rows.length === 0) {
+        ws.close(4003, 'Acesso negado à sessão');
+        return;
+      }
+    } catch (err) {
+      ws.close(4000, 'Erro de verificação');
       return;
     }
 
-    // Register client in session
+    // Register client
     if (!sessionClients.has(sessionId)) {
       sessionClients.set(sessionId, new Set());
     }
@@ -49,34 +73,42 @@ function setupWebSocket(server) {
 
     console.log(`[WS] User ${userId} connected to session ${sessionId}`);
 
+    // Ping/pong keepalive
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+
     ws.on('message', async (raw) => {
       let payload;
       try {
-        payload = JSON.parse(raw);
+        payload = JSON.parse(raw.toString());
       } catch {
         ws.send(JSON.stringify({ type: 'error', error: 'JSON inválido' }));
         return;
       }
 
+      if (payload.type === 'ping') {
+        ws.send(JSON.stringify({ type: 'pong' }));
+        return;
+      }
+
       if (payload.type === 'send_message') {
-        const { content, messageType, metadata } = payload;
+        const { content, messageType } = payload;
         if (!content) {
           ws.send(JSON.stringify({ type: 'error', error: 'Conteúdo é obrigatório' }));
           return;
         }
         try {
-          const message = await chatService.sendMessage(sessionId, userId, {
-            type: messageType || 'text',
-            content,
-            metadata,
-          });
-          // Broadcast to all clients in this session
+          const { rows } = await pool.query(
+            `INSERT INTO messages (session_id, sender_id, type, content)
+             VALUES ($1, $2, $3, $4) RETURNING *`,
+            [sessionId, userId, messageType || 'text', content]
+          );
+          const message = rows[0];
           broadcastToSession(sessionId, { type: 'new_message', data: message });
         } catch (err) {
           ws.send(JSON.stringify({ type: 'error', error: err.message }));
         }
-      } else if (payload.type === 'ping') {
-        ws.send(JSON.stringify({ type: 'pong' }));
+        return;
       }
     });
 
@@ -90,29 +122,27 @@ function setupWebSocket(server) {
     });
 
     ws.on('error', (err) => {
-      console.error(`[WS] Error for user ${userId}:`, err.message);
+      console.error(`[WS] Socket error for user ${userId}:`, err.message);
     });
 
-    // Send confirmation
     ws.send(JSON.stringify({ type: 'connected', sessionId, userId }));
   });
 
-  function broadcastToSession(sessionId, data) {
-    const clients = sessionClients.get(sessionId);
-    if (!clients) return;
-    const message = JSON.stringify(data);
-    for (const client of clients) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    }
-  }
+  // Keepalive interval
+  const interval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (!ws.isAlive) { ws.terminate(); return; }
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
 
-  // Attach broadcastToSession to wss for use from REST endpoints
+  wss.on('close', () => clearInterval(interval));
+
   wss.broadcastToSession = broadcastToSession;
 
   console.log('[WS] WebSocket server ready at /ws');
-  return wss;
+  return { broadcastToSession };
 }
 
-module.exports = { setupWebSocket };
+module.exports = { attachWebSocket, broadcastToSession };
