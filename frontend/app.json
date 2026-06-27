@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "TIP",
+    "slug": "tip-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#1E4D5C" },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.tip.app" },
+    "android": { "package": "com.tip.app", "adaptiveIcon": { "backgroundColor": "#1E4D5C" } }
+  }
+}
