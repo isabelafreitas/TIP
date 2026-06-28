@@ -1,17 +1,28 @@
 export default function Textarea({ label, error, maxLength, className = '', value = '', ...props }) {
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
-      {label && <label className="text-sm font-semibold text-tip-text">{label}</label>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }} className={className}>
+      {label && (
+        <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C' }}>{label}</label>
+      )}
       <textarea
         value={value}
-        className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-tip-text placeholder:text-tip-light outline-none resize-none transition-all
-          ${error ? 'border-red-tip' : 'border-cream-border focus:border-petroleum'}`}
+        style={{
+          width: '100%',
+          borderRadius: 12,
+          border: `1px solid ${error ? '#A32D2D' : '#D0CEC4'}`,
+          background: '#fff',
+          padding: '9px 12px',
+          fontSize: 11,
+          color: '#6A6858',
+          outline: 'none',
+          resize: 'none',
+        }}
         maxLength={maxLength}
         {...props}
       />
-      <div className="flex justify-between">
-        {error ? <p className="text-xs text-red-tip">{error}</p> : <span />}
-        {maxLength && <p className="text-xs text-tip-light">{value.length}/{maxLength}</p>}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {error ? <p style={{ fontSize: 10, color: '#A32D2D' }}>{error}</p> : <span />}
+        {maxLength && <p style={{ fontSize: 10, color: '#B0A898' }}>{value.length}/{maxLength}</p>}
       </div>
     </div>
   )

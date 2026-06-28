@@ -1,11 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Bookmark, BookmarkCheck, MapPin, Calendar, Star } from 'lucide-react'
+import { Bookmark, BookmarkCheck, MapPin, Calendar, Star, ArrowLeft } from 'lucide-react'
 import { getProvider } from '../data/providers'
 import { useAuthStore } from '../store/authStore'
 import Avatar from '../components/Avatar'
-import Card from '../components/Card'
-import Button from '../components/Button'
 import StarRating from '../components/StarRating'
+import Button from '../components/Button'
 
 export default function ProviderScreen() {
   const { id } = useParams()
@@ -15,111 +14,134 @@ export default function ProviderScreen() {
   const saved = currentUser?.saved?.includes(id)
 
   if (!provider) return (
-    <div className="flex items-center justify-center h-screen">
-      <p className="text-tip-mid">Profissional não encontrada</p>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <p style={{ color: '#6A6858' }}>Profissional não encontrada</p>
     </div>
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream">
-      {/* Hero */}
-      <div className="bg-petroleum px-5 pt-14 pb-6">
-        <div className="flex justify-between items-start mb-4">
-          <button onClick={() => navigate(-1)} className="text-white/80 text-sm">← Voltar</button>
-          <button onClick={() => toggleSaved(id)} className="text-white p-1">
-            {saved ? <BookmarkCheck size={22} className="fill-white" /> : <Bookmark size={22} />}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7' }}>
+      {/* Profile header card — petroleum bg */}
+      <div style={{ background: '#1E4D5C', borderRadius: '0 0 20px 20px', padding: '16px 20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#FBFAF7', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}
+          >
+            <ArrowLeft size={18} color="#FBFAF7" />
+          </button>
+          <button
+            onClick={() => toggleSaved(id)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#FBFAF7' }}
+          >
+            {saved ? <BookmarkCheck size={20} fill="#FBFAF7" color="#FBFAF7" /> : <Bookmark size={20} color="#FBFAF7" />}
           </button>
         </div>
-        <div className="flex flex-col items-center text-center gap-3">
-          <Avatar initials={provider.initials} size="xl" className="border-4 border-white/30" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
+          <div style={{ border: '3px solid #C8960A', borderRadius: '50%', padding: 3 }}>
+            <Avatar initials={provider.initials} size="xl" />
+          </div>
           <div>
-            <h1 className="text-white text-xl font-bold">{provider.name}</h1>
-            <div className="flex items-center justify-center gap-2 mt-1">
-              <StarRating rating={provider.rating} size={14} />
-              <span className="text-petroleum-light text-sm">{provider.rating} ({provider.ratingCount} avaliações)</span>
+            <h1 style={{ color: '#FBFAF7', fontSize: 14, fontWeight: 700 }}>{provider.name}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4 }}>
+              <StarRating rating={provider.rating} size={13} />
+              <span style={{ color: '#C8960A', fontSize: 12, fontWeight: 600 }}>{provider.rating}</span>
+              <span style={{ color: '#9BBDC7', fontSize: 11 }}>({provider.ratingCount} avaliações)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+              <span style={{ color: '#9BBDC7', fontSize: 10 }}>
+                <MapPin size={10} style={{ display: 'inline', marginRight: 3 }} />
+                {provider.neighborhood} · {provider.distanceKm}km
+              </span>
+              <span style={{ color: '#9BBDC7', fontSize: 10 }}>
+                <Calendar size={10} style={{ display: 'inline', marginRight: 3 }} />
+                {provider.availableDays.slice(0, 3).join(', ')}
+              </span>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap justify-center">
-            <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">{provider.level}</span>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span style={{ background: 'rgba(255,255,255,0.15)', color: '#FBFAF7', fontSize: 10, padding: '3px 10px', borderRadius: 9999 }}>
+              {provider.level}
+            </span>
             {provider.badges.map(b => (
-              <span key={b} className="bg-mustard/80 text-white text-xs px-3 py-1 rounded-full">{b}</span>
+              <span key={b} style={{ background: 'rgba(255,255,255,0.12)', color: '#FBFAF7', fontSize: 10, padding: '3px 10px', borderRadius: 9999 }}>{b}</span>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-5 flex flex-col gap-4 pb-32">
+      <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 100 }}>
         {/* Bio */}
-        <Card>
-          <h3 className="font-bold text-tip-text mb-2">Sobre</h3>
-          <p className="text-sm text-tip-mid leading-relaxed">{provider.bio}</p>
-        </Card>
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: 14 }}>
+          <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1A18', marginBottom: 8 }}>Sobre</h3>
+          <p style={{ fontSize: 11, color: '#6A6858', lineHeight: 1.6 }}>{provider.bio}</p>
+        </div>
 
-        {/* Services */}
-        <Card>
-          <h3 className="font-bold text-tip-text mb-3">Serviços</h3>
-          <div className="flex flex-wrap gap-2 mb-3">
+        {/* Services / Zone */}
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: 14 }}>
+          <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1A18', marginBottom: 10 }}>Serviços</h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
             {provider.category.map(c => (
-              <span key={c} className="bg-petroleum-bg text-petroleum text-xs px-3 py-1 rounded-full">{c}</span>
+              <span key={c} style={{ background: '#EEF3F4', color: '#1E4D5C', fontSize: 10, padding: '3px 10px', borderRadius: 9999 }}>{c}</span>
             ))}
           </div>
-          <div className="flex flex-col gap-2 text-sm text-tip-mid">
-            <div className="flex items-center gap-2">
-              <span className="text-mustard font-bold text-base">R${provider.priceMin}–R${provider.priceMax}</span>
-              <span className="text-tip-light">por serviço</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 10, color: '#6A6858', textTransform: 'uppercase', fontWeight: 600 }}>Valor</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#C8960A' }}>R${provider.priceMin}–R${provider.priceMax}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <MapPin size={14} className="text-tip-light" />
-              <span>{provider.neighborhood} · {provider.distanceKm}km</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 10, color: '#6A6858', textTransform: 'uppercase', fontWeight: 600 }}>Local</span>
+              <span style={{ fontSize: 11, color: '#1A1A18' }}>{provider.neighborhood}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={14} className="text-tip-light" />
-              <span>{provider.availableDays.join(', ')}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 10, color: '#6A6858', textTransform: 'uppercase', fontWeight: 600 }}>Disponível</span>
+              <span style={{ fontSize: 11, color: '#1A1A18' }}>{provider.availableDays.join(', ')}</span>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Portfolio */}
-        <Card>
-          <h3 className="font-bold text-tip-text mb-3">Portfólio</h3>
-          <div className="grid grid-cols-3 gap-3">
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: 14 }}>
+          <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1A18', marginBottom: 10 }}>Portfólio</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {provider.portfolio.map((emoji, i) => (
-              <div key={i} className="bg-cream-mid rounded-xl h-20 flex items-center justify-center text-4xl">
+              <div key={i} style={{ background: '#EEF3F4', borderRadius: 10, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
                 {emoji}
               </div>
             ))}
           </div>
-        </Card>
+        </div>
 
         {/* Reviews */}
-        <Card>
-          <h3 className="font-bold text-tip-text mb-3">Avaliações</h3>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="text-4xl font-bold text-tip-text">{provider.rating}</div>
+        <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: 14 }}>
+          <h3 style={{ fontSize: 12, fontWeight: 600, color: '#1A1A18', marginBottom: 10 }}>Avaliações</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#1A1A18' }}>{provider.rating}</div>
             <div>
-              <StarRating rating={provider.rating} size={18} />
-              <p className="text-xs text-tip-mid mt-1">{provider.ratingCount} avaliações</p>
+              <StarRating rating={provider.rating} size={16} />
+              <p style={{ fontSize: 10, color: '#6A6858', marginTop: 3 }}>{provider.ratingCount} avaliações</p>
             </div>
           </div>
-          <div className="flex flex-col gap-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {provider.reviews.map((r, i) => (
-              <div key={i} className="border-t border-cream-border pt-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm text-tip-text">{r.author}</span>
-                  <div className="flex items-center gap-1">
-                    <Star size={12} className="text-mustard fill-mustard" />
-                    <span className="text-xs text-tip-mid">{r.rating}</span>
+              <div key={i} style={{ background: '#EEF3F4', borderRadius: 10, padding: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600, fontSize: 10, color: '#1A1A18' }}>{r.author}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <Star size={10} color="#C8960A" fill="#C8960A" />
+                    <span style={{ fontSize: 10, color: '#6A6858' }}>{r.rating}</span>
                   </div>
                 </div>
-                <p className="text-sm text-tip-mid">{r.comment}</p>
+                <p style={{ fontSize: 9, color: '#6A6858', lineHeight: 1.5 }}>{r.comment}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Fixed CTA */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] bg-white border-t border-cream-border p-4">
+      {/* Sticky CTA */}
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 390, background: '#fff', borderTop: '1px solid #EEF3F4', padding: '12px 16px' }}>
         <Button
           variant="primary"
           size="lg"

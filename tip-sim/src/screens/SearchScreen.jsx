@@ -31,24 +31,43 @@ export default function SearchScreen() {
   })
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7' }}>
       {/* Header */}
-      <div className="bg-petroleum px-4 pt-12 pb-4 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="text-white p-1">
-          <ArrowLeft size={22} />
-        </button>
+      <div style={{ padding: '12px 16px 12px', borderBottom: '1px solid #EEF3F4', background: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 2 }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1E4D5C', padding: 4 }}
+          >
+            <ArrowLeft size={20} color="#1E4D5C" />
+          </button>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A18', lineHeight: 1 }}>Buscar</p>
+            <p style={{ fontSize: 10, color: '#6A6858', marginTop: 2 }}>São Paulo, SP</p>
+          </div>
+        </div>
         <input
           autoFocus
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Buscar serviço ou profissional..."
-          className="flex-1 bg-white/15 text-white placeholder:text-white/60 rounded-xl px-4 py-2.5 text-sm outline-none"
+          style={{
+            width: '100%',
+            border: '1.5px solid #1E4D5C',
+            borderRadius: 12,
+            padding: '9px 12px',
+            fontSize: 12,
+            color: '#6A6858',
+            background: '#fff',
+            outline: 'none',
+            marginTop: 8,
+          }}
         />
       </div>
 
       {/* Filters */}
-      <div className="bg-white border-b border-cream-border px-4 py-3">
-        <div className="flex gap-2 overflow-x-auto pb-1">
+      <div style={{ background: '#fff', borderBottom: '1px solid #EEF3F4', padding: '10px 16px' }}>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
           <Chip
             label="Distância"
             active={filters.distance}
@@ -64,27 +83,27 @@ export default function SearchScreen() {
             active={showMore}
             onClick={() => setShowMore(!showMore)}
           />
-          <button className="flex items-center gap-1 text-xs text-petroleum">
-            <SlidersHorizontal size={14} />
+          <button style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#1E4D5C', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <SlidersHorizontal size={13} />
           </button>
         </div>
 
         {showMore && (
-          <div className="mt-3 flex flex-col gap-3">
+          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div>
-              <label className="text-xs font-semibold text-tip-text">Preço máximo: R${priceMax}</label>
+              <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C' }}>Preço máximo: R${priceMax}</label>
               <input
                 type="range"
                 min={30}
                 max={300}
                 value={priceMax}
                 onChange={e => setPriceMax(Number(e.target.value))}
-                className="w-full mt-1 accent-petroleum"
+                style={{ width: '100%', marginTop: 4, accentColor: '#1E4D5C' }}
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-tip-text">Nível</label>
-              <div className="flex gap-2 mt-1">
+              <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C' }}>Nível</label>
+              <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                 {['', 'Especialista', 'Verificada', 'Amador'].map(l => (
                   <Chip key={l} label={l || 'Todos'} active={levelFilter === l} onClick={() => setLevelFilter(l)} />
                 ))}
@@ -95,13 +114,15 @@ export default function SearchScreen() {
       </div>
 
       {/* Results */}
-      <div className="flex-1 px-4 py-4 flex flex-col gap-3">
-        <p className="text-xs text-tip-mid">{filtered.length} profissional{filtered.length !== 1 ? 'is' : ''} encontrado{filtered.length !== 1 ? 's' : ''}</p>
+      <div style={{ flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <p style={{ fontSize: 10, color: '#6A6858' }}>
+          {filtered.length} prestadora{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
+        </p>
         {filtered.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center py-16">
-            <span className="text-5xl mb-4">🔍</span>
-            <p className="font-semibold text-tip-text">Nenhum resultado</p>
-            <p className="text-sm text-tip-mid mt-1">Tente outros termos ou ajuste os filtros</p>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '48px 0' }}>
+            <span style={{ fontSize: 40, marginBottom: 12 }}>🔍</span>
+            <p style={{ fontWeight: 600, fontSize: 14, color: '#1A1A18' }}>Nenhum resultado</p>
+            <p style={{ fontSize: 12, color: '#6A6858', marginTop: 4 }}>Tente outros termos ou ajuste os filtros</p>
           </div>
         ) : (
           filtered.map(p => <ProviderCard key={p.id} provider={p} />)

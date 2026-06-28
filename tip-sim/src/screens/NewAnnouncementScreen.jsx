@@ -38,10 +38,10 @@ export default function NewAnnouncementScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream pb-6">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7', paddingBottom: 24 }}>
       <ProfileHeader title="Nova necessidade" />
 
-      <div className="px-4 py-5 flex flex-col gap-4">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <Textarea
           label="Descreva o que você precisa"
           placeholder="Ex: Preciso de alguém para instalar uma prateleira na sala..."
@@ -52,8 +52,8 @@ export default function NewAnnouncementScreen() {
         />
 
         <div>
-          <label className="text-sm font-semibold text-tip-text">Categoria</label>
-          <div className="flex flex-wrap gap-2 mt-2">
+          <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C', display: 'block', marginBottom: 8 }}>Categoria</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {tagOptions.map(t => (
               <Chip key={t} label={t} active={tags.includes(t)} onClick={() => toggleTag(t)} />
             ))}
@@ -61,7 +61,8 @@ export default function NewAnnouncementScreen() {
         </div>
 
         <Input
-          label="Valor que pagaria (opcional)"
+          label="Valor que pagaria"
+          optional
           type="number"
           placeholder="R$"
           value={price}
@@ -69,8 +70,8 @@ export default function NewAnnouncementScreen() {
         />
 
         <div>
-          <label className="text-sm font-semibold text-tip-text">Prazo</label>
-          <div className="flex flex-wrap gap-2 mt-2">
+          <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C', display: 'block', marginBottom: 8 }}>Prazo</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {deadlineOptions.map(d => (
               <Chip key={d} label={d} active={deadline === d} onClick={() => setDeadline(d)} />
             ))}

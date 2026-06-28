@@ -13,7 +13,7 @@ import Chip from '../components/Chip'
 import Modal from '../components/Modal'
 import Avatar from '../components/Avatar'
 import Spinner from '../components/Spinner'
-import { Camera } from 'lucide-react'
+import { Camera, ArrowLeft } from 'lucide-react'
 
 const periods = ['Manhã', 'Tarde', 'Noite']
 
@@ -38,10 +38,10 @@ export default function RequestServiceScreen() {
   const [errors, setErrors] = useState({})
 
   if (!provider) return (
-    <div className="flex flex-col min-h-screen">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)' }}>
       <ProfileHeader title="Solicitar serviço" />
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-tip-mid">Nenhuma profissional selecionada</p>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#6A6858' }}>Nenhuma profissional selecionada</p>
       </div>
     </div>
   )
@@ -73,16 +73,12 @@ export default function RequestServiceScreen() {
     })
 
     setCreatedService(svc)
-
-    // Simulate waiting for provider accept
     setWaitModal(true)
     await new Promise(r => setTimeout(r, 2000))
     acceptService(svc.id)
     setWaitModal(false)
 
-    // Create chat session
     const session = getOrCreateSession(user.id, provider.id, provider.name, provider.initials)
-    // Attach chat session to service
     svc.chatSessionId = session.id
 
     setPayModal(true)
@@ -96,16 +92,31 @@ export default function RequestServiceScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream pb-6">
-      <ProfileHeader title="Solicitar serviço" />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7', paddingBottom: 24 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid #EEF3F4', background: '#fff' }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <ArrowLeft size={20} color="#1E4D5C" />
+        </button>
+        <h1 style={{ fontSize: 14, fontWeight: 700, color: '#1A1A18' }}>Solicitar serviço</h1>
+      </div>
 
-      <div className="px-4 py-5 flex flex-col gap-4">
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {/* Mini provider card */}
-        <div className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+        <div style={{ background: '#EEF3F4', borderRadius: 12, padding: '12px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Avatar initials={provider.initials} size="md" />
           <div>
-            <p className="font-bold text-tip-text text-sm">{provider.name}</p>
-            <p className="text-xs text-tip-mid">{provider.category.join(' · ')}</p>
+            <p style={{ fontWeight: 600, fontSize: 12, color: '#1A1A18' }}>{provider.name}</p>
+            <p style={{ fontSize: 10, color: '#6A6858' }}>{provider.category.join(' · ')}</p>
+          </div>
+        </div>
+
+        {/* Pre-filled zone card */}
+        <div style={{ background: '#F5F4F0', borderRadius: 12, border: '1px solid #1E4D5C', padding: 12 }}>
+          <p style={{ fontSize: 10, color: '#2E6E84', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Detalhes</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#6A6858' }}>
+            <span>Faixa de preço</span>
+            <span style={{ color: '#C8960A', fontWeight: 600 }}>R${provider.priceMin}–R${provider.priceMax}</span>
           </div>
         </div>
 
@@ -129,13 +140,13 @@ export default function RequestServiceScreen() {
         />
 
         <div>
-          <label className="text-sm font-semibold text-tip-text">Período</label>
-          <div className="flex gap-2 mt-2">
+          <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C', marginBottom: 6, display: 'block' }}>Período</label>
+          <div style={{ display: 'flex', gap: 6 }}>
             {periods.map(p => (
               <Chip key={p} label={p} active={period === p} onClick={() => setPeriod(p)} />
             ))}
           </div>
-          {errors.period && <p className="text-xs text-red-tip mt-1">{errors.period}</p>}
+          {errors.period && <p style={{ fontSize: 11, color: '#A32D2D', marginTop: 4 }}>{errors.period}</p>}
         </div>
 
         <Input
@@ -146,21 +157,34 @@ export default function RequestServiceScreen() {
           helper={`Faixa desta profissional: R$${provider.priceMin}–R$${provider.priceMax}`}
         />
 
+        {/* Photo upload */}
         <div>
-          <label className="text-sm font-semibold text-tip-text">Foto (opcional)</label>
-          <label className="mt-2 flex flex-col items-center justify-center border-2 border-dashed border-cream-border rounded-xl p-6 cursor-pointer hover:border-petroleum transition-colors">
+          <label style={{ fontSize: 10, fontWeight: 600, color: '#1E4D5C', marginBottom: 6, display: 'block' }}>
+            Foto <span style={{ color: '#B0A898', fontWeight: 400 }}>(opcional)</span>
+          </label>
+          <label style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px dashed #EEF3F4',
+            borderRadius: 12,
+            padding: 20,
+            cursor: 'pointer',
+            background: '#F5F4F0',
+          }}>
             {photo ? (
-              <img src={photo} alt="preview" className="w-full h-32 object-cover rounded-lg" />
+              <img src={photo} alt="preview" style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 8 }} />
             ) : (
               <>
-                <Camera size={24} className="text-tip-light mb-2" />
-                <span className="text-sm text-tip-mid">Adicionar foto</span>
+                <Camera size={22} color="#B0A898" />
+                <span style={{ fontSize: 11, color: '#6A6858', marginTop: 6 }}>Adicionar foto</span>
               </>
             )}
             <input
               type="file"
               accept="image/*"
-              className="hidden"
+              style={{ display: 'none' }}
               onChange={e => {
                 const f = e.target.files[0]
                 if (f) { const r = new FileReader(); r.onload = ev => setPhoto(ev.target.result); r.readAsDataURL(f) }
@@ -176,37 +200,37 @@ export default function RequestServiceScreen() {
 
       {/* Waiting modal */}
       {waitModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
-          <div className="bg-white rounded-3xl p-8 mx-4 flex flex-col items-center gap-4">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 24, padding: 32, margin: '0 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <Spinner size="lg" color="petroleum" />
-            <p className="font-bold text-tip-text">Aguardando aceite...</p>
-            <p className="text-sm text-tip-mid text-center">Enviando sua solicitação para {provider.name}</p>
+            <p style={{ fontWeight: 700, fontSize: 14, color: '#1A1A18' }}>Aguardando aceite...</p>
+            <p style={{ fontSize: 12, color: '#6A6858', textAlign: 'center' }}>Enviando sua solicitação para {provider.name}</p>
           </div>
         </div>
       )}
 
       {/* Payment modal */}
       <Modal open={payModal} onClose={() => setPayModal(false)} title="Confirmar pagamento">
-        <div className="flex flex-col gap-4">
-          <div className="bg-cream-mid rounded-xl p-4 flex flex-col gap-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-tip-mid">Serviço</span>
-              <span className="font-semibold">{formatCurrency(pricing.serviceAmount)}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ background: '#F5F4F0', borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#6A6858' }}>Serviço</span>
+              <span style={{ fontWeight: 600 }}>{formatCurrency(pricing.serviceAmount)}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-tip-mid">Taxa TIP (15%)</span>
-              <span className="font-semibold text-mustard-dark">{formatCurrency(pricing.tipFee)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#6A6858' }}>Taxa TIP (15%)</span>
+              <span style={{ fontWeight: 600, color: '#C8960A' }}>{formatCurrency(pricing.tipFee)}</span>
             </div>
-            <div className="border-t border-cream-border pt-2 flex justify-between">
-              <span className="font-bold text-tip-text">Total</span>
-              <span className="font-bold text-petroleum">{formatCurrency(pricing.total)}</span>
+            <div style={{ borderTop: '1px solid #E0DED6', paddingTop: 8, display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 700, fontSize: 13, color: '#1A1A18' }}>Total</span>
+              <span style={{ fontWeight: 700, fontSize: 13, color: '#1E4D5C' }}>{formatCurrency(pricing.total)}</span>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-semibold text-tip-text">Forma de pagamento</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1A18' }}>Forma de pagamento</p>
             {['💸 Pix', '💳 Cartão de crédito', '🏦 Débito'].map(m => (
-              <button key={m} className="w-full text-left px-4 py-3 rounded-xl border border-cream-border text-sm font-medium hover:border-petroleum transition-colors">
+              <button key={m} style={{ width: '100%', textAlign: 'left', padding: '10px 14px', borderRadius: 12, border: '1px solid #E0DED6', fontSize: 12, fontWeight: 500, background: '#fff', cursor: 'pointer' }}>
                 {m}
               </button>
             ))}

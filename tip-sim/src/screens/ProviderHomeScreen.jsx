@@ -5,8 +5,8 @@ import { useServicesStore } from '../store/servicesStore'
 import { useAnnouncementsStore } from '../store/announcementsStore'
 import NavBar from '../components/NavBar'
 import Avatar from '../components/Avatar'
-import Card from '../components/Card'
 import Toggle from '../components/Toggle'
+import Button from '../components/Button'
 
 export default function ProviderHomeScreen() {
   const navigate = useNavigate()
@@ -22,62 +22,68 @@ export default function ProviderHomeScreen() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
   })
 
+  const stats = [
+    { label: 'Serviços', value: thisMonth.length, sub: 'este mês' },
+    { label: 'Avaliação', value: user?.rating || '—', sub: 'média' },
+    { label: 'Ganhos', value: `R$${thisMonth.reduce((s, svc) => s + (svc.amount || 0) * 0.85, 0).toFixed(0)}`, sub: 'este mês' },
+    { label: 'Perfil', value: `${user?.completion || 65}%`, sub: 'completo' },
+  ]
+
   return (
-    <div className="flex flex-col min-h-screen bg-cream pb-20">
-      <div className="bg-petroleum px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7', paddingBottom: 70 }}>
+      {/* Header */}
+      <div style={{ padding: '16px 20px 14px', background: '#fff', borderBottom: '1px solid #EEF3F4' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <p className="text-petroleum-light text-sm">Modo prestadora</p>
-            <h1 className="text-white text-xl font-bold">{user?.name?.split(' ')[0]} 👩‍🔧</h1>
+            <p style={{ fontSize: 11, color: '#6A6858' }}>Modo prestadora</p>
+            <h1 style={{ fontSize: 16, fontWeight: 700, color: '#1A1A18' }}>{user?.name?.split(' ')[0]} 👩‍🔧</h1>
           </div>
-          <button onClick={() => navigate('/provider-profile')}>
-            <Avatar initials={user?.initials} photo={user?.photo} size="lg" className="border-2 border-white/30" />
+          <button onClick={() => navigate('/provider-profile')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <Avatar initials={user?.initials} photo={user?.photo} size="lg" />
           </button>
         </div>
-        <div className="mt-4 bg-white/15 rounded-2xl p-4">
+        <div style={{ marginTop: 12, background: '#EEF3F4', borderRadius: 12, padding: '10px 14px' }}>
           <Toggle checked={available} onChange={setAvailable} label={available ? '🟢 Disponível agora' : '⚫ Indisponível'} />
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-5 flex flex-col gap-5">
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Serviços', value: thisMonth.length, sub: 'este mês' },
-            { label: 'Avaliação', value: user?.rating || '—', sub: 'média' },
-            { label: 'Ganhos', value: `R$${thisMonth.reduce((s, svc) => s + (svc.amount || 0) * 0.85, 0).toFixed(0)}`, sub: 'este mês' },
-          ].map(stat => (
-            <Card key={stat.label} className="text-center">
-              <p className="text-xl font-bold text-petroleum">{stat.value}</p>
-              <p className="text-xs text-tip-mid">{stat.label}</p>
-              <p className="text-xs text-tip-light">{stat.sub}</p>
-            </Card>
+      <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Stats grid 2x2 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+          {stats.map(stat => (
+            <div key={stat.label} style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: '12px', textAlign: 'center' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#1E4D5C' }}>{stat.value}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#1A1A18', marginTop: 2 }}>{stat.label}</p>
+              <p style={{ fontSize: 9, color: '#6A6858' }}>{stat.sub}</p>
+            </div>
           ))}
         </div>
 
         {/* Opportunities */}
         <div>
-          <h2 className="font-bold text-tip-text mb-3">Oportunidades próximas</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1A1A18', marginBottom: 10 }}>Oportunidades próximas</h2>
           {announcements.length === 0 ? (
-            <Card className="text-center py-6">
-              <p className="text-tip-mid text-sm">Nenhuma oportunidade no momento</p>
-            </Card>
+            <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: '24px', textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: '#6A6858' }}>Nenhuma oportunidade no momento</p>
+            </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {announcements.slice(0, 5).map(ann => (
-                <Card key={ann.id}>
-                  <div className="flex flex-wrap gap-1 mb-2">
+                <div key={ann.id} style={{ background: '#fff', borderRadius: 12, border: '1px solid #EEF3F4', padding: 14 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
                     {(ann.tags || []).map(t => (
-                      <span key={t} className="text-xs bg-petroleum-bg text-petroleum px-2 py-0.5 rounded-full">{t}</span>
+                      <span key={t} style={{ fontSize: 9, background: '#EEF3F4', color: '#1E4D5C', padding: '2px 8px', borderRadius: 9999, fontWeight: 500 }}>{t}</span>
                     ))}
                   </div>
-                  <p className="text-sm text-tip-text line-clamp-2">{ann.description}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-tip-mid">{ann.deadline}</span>
-                    {ann.price && <span className="text-sm font-bold text-mustard-dark">R${ann.price}</span>}
+                  <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1A18', lineHeight: 1.4, marginBottom: 4 }}>{ann.description.slice(0, 80)}{ann.description.length > 80 ? '...' : ''}</p>
+                  <p style={{ fontSize: 10, color: '#6A6858', marginBottom: 8 }}>{ann.deadline}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {ann.price && <span style={{ fontSize: 12, fontWeight: 700, color: '#C8960A' }}>R${ann.price}</span>}
+                    <Button variant="primary" size="sm">
+                      Candidatar-se
+                    </Button>
                   </div>
-                  <button className="mt-2 text-xs font-semibold text-petroleum">Candidatar-se →</button>
-                </Card>
+                </div>
               ))}
             </div>
           )}

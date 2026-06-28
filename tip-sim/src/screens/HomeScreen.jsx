@@ -20,33 +20,44 @@ export default function HomeScreen() {
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream pb-20">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7', paddingBottom: 64 }}>
       {/* Header */}
-      <div className="bg-petroleum px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between">
+      <div style={{ padding: '16px 20px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <div>
-            <p className="text-petroleum-light text-sm">{greeting},</p>
-            <h1 className="text-white text-xl font-bold">{user?.name?.split(' ')[0]} 👋</h1>
+            <p style={{ fontSize: 11, color: '#6A6858' }}>{greeting},</p>
+            <h1 style={{ fontSize: 16, fontWeight: 700, color: '#1A1A18' }}>{user?.name?.split(' ')[0]} 👋</h1>
             {user?.neighborhood && (
-              <p className="text-petroleum-light text-xs mt-0.5">📍 {user.neighborhood}</p>
+              <p style={{ fontSize: 10, color: '#6A6858', marginTop: 2 }}>📍 {user.neighborhood}</p>
             )}
           </div>
-          <button onClick={() => navigate('/profile')}>
-            <Avatar initials={user?.initials} photo={user?.photo} size="lg" className="border-2 border-white/30" />
+          <button onClick={() => navigate('/profile')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <Avatar initials={user?.initials} photo={user?.photo} size="lg" />
           </button>
         </div>
 
-        {/* Search */}
+        {/* Search bar */}
         <button
           onClick={() => navigate('/search')}
-          className="mt-4 w-full bg-white/15 text-white/70 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-left"
+          style={{
+            width: '100%',
+            background: '#fff',
+            border: '1.5px solid #1E4D5C',
+            borderRadius: 12,
+            padding: '10px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
         >
-          <Search size={16} />
-          Buscar serviço ou profissional...
+          <Search size={15} color="#1E4D5C" />
+          <span style={{ fontSize: 12, color: '#B0A898' }}>Buscar serviço ou profissional...</span>
         </button>
       </div>
 
-      <div className="flex-1 px-5 py-5 flex flex-col gap-6">
+      <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
         {/* Active service banner */}
         {activeService && (
           <Banner
@@ -61,16 +72,43 @@ export default function HomeScreen() {
 
         {/* Popular services */}
         <div>
-          <h2 className="text-tip-text font-bold text-base mb-3">Serviços populares</h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1A1A18' }}>Serviços populares</h2>
+            <button
+              onClick={() => navigate('/search')}
+              style={{ fontSize: 11, color: '#2E6E84', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+            >
+              ver todos
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => navigate(`/search?cat=${cat.id}`)}
-                className="bg-white rounded-2xl p-3 flex flex-col items-center gap-2 shadow-sm active:scale-95 transition-transform"
+                style={{
+                  background: cat.id === 'mais' ? '#1E4D5C' : '#EEF3F4',
+                  borderRadius: 12,
+                  padding: '12px 8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 6,
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+                className="active:scale-95 transition-transform"
               >
-                <span className="text-2xl">{cat.emoji}</span>
-                <span className="text-xs font-medium text-tip-text text-center leading-tight">{cat.label}</span>
+                <span style={{ fontSize: 22 }}>{cat.emoji}</span>
+                <span style={{
+                  fontSize: 9,
+                  fontWeight: 500,
+                  color: cat.id === 'mais' ? '#FBFAF7' : '#1E4D5C',
+                  textAlign: 'center',
+                  lineHeight: 1.3,
+                }}>
+                  {cat.label}
+                </span>
               </button>
             ))}
           </div>
@@ -78,16 +116,31 @@ export default function HomeScreen() {
 
         {/* Unusual services */}
         <div>
-          <h2 className="text-tip-text font-bold text-base mb-3">Necessidades incomuns</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1A1A18' }}>Necessidades incomuns</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
             {unusualCategories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => navigate(`/search?cat=${cat.id}`)}
-                className="bg-white rounded-2xl p-3 flex items-center gap-3 shadow-sm active:scale-95 transition-transform"
+                style={{
+                  background: cat.id === 'todos' ? '#EEF3F4' : '#fff',
+                  borderRadius: 12,
+                  padding: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  border: '1px solid #EEF3F4',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+                className="active:scale-95 transition-transform"
               >
-                <span className="text-xl">{cat.emoji}</span>
-                <span className="text-xs font-medium text-tip-text text-left leading-tight">{cat.label}</span>
+                <span style={{ fontSize: 18 }}>{cat.emoji}</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: '#1E4D5C', lineHeight: 1.3 }}>
+                  {cat.label}{cat.id === 'todos' ? ' →' : ''}
+                </span>
               </button>
             ))}
           </div>
