@@ -10,45 +10,63 @@ export default function ProviderCard({ provider }) {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm p-4 flex gap-3 cursor-pointer active:scale-[0.99] transition-transform"
+      style={{
+        background: '#fff',
+        borderRadius: 12,
+        border: '1px solid #EEF3F4',
+        padding: '12px',
+        display: 'flex',
+        gap: 10,
+        cursor: 'pointer',
+      }}
       onClick={() => navigate(`/provider/${provider.id}`)}
+      className="active:scale-[0.99] transition-transform"
     >
       <Avatar initials={provider.initials} size="lg" />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between">
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <div>
-            <p className="font-bold text-tip-text text-sm">{provider.name}</p>
-            <p className="text-xs text-tip-mid">{provider.category.join(' • ')}</p>
+            <p style={{ fontWeight: 600, fontSize: 11, color: '#1A1A18' }}>{provider.name}</p>
+            <p style={{ fontSize: 10, color: '#6A6858', marginTop: 1 }}>{provider.category.join(' • ')}</p>
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); toggleSaved(provider.id) }}
-            className="text-tip-light hover:text-petroleum p-1"
+            style={{ padding: 4, color: '#B0A898', background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            {saved ? <BookmarkCheck size={18} className="text-petroleum" /> : <Bookmark size={18} />}
+            {saved ? <BookmarkCheck size={16} color="#1E4D5C" /> : <Bookmark size={16} />}
           </button>
         </div>
-        <div className="flex items-center gap-3 mt-2 flex-wrap">
-          <div className="flex items-center gap-1">
-            <Star size={12} className="text-mustard fill-mustard" />
-            <span className="text-xs font-semibold text-tip-text">{provider.rating}</span>
-            <span className="text-xs text-tip-light">({provider.ratingCount})</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <Star size={11} color="#C8960A" fill="#C8960A" />
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#1A1A18' }}>{provider.rating}</span>
+            <span style={{ fontSize: 10, color: '#B0A898' }}>({provider.ratingCount})</span>
           </div>
-          <div className="flex items-center gap-1">
-            <MapPin size={12} className="text-tip-light" />
-            <span className="text-xs text-tip-light">{provider.distanceKm}km</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <MapPin size={10} color="#B0A898" />
+            <span style={{ fontSize: 9, color: '#6A6858' }}>{provider.distanceKm}km</span>
           </div>
-          <span className="text-xs font-semibold text-mustard-dark">
+          <span style={{ fontSize: 9, color: '#6A6858' }}>{provider.neighborhood}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#C8960A' }}>
             R${provider.priceMin}–{provider.priceMax}
           </span>
-        </div>
-        <div className="mt-1">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${
-            provider.level === 'Especialista' ? 'bg-petroleum-bg text-petroleum' :
-            provider.level === 'Verificada' || provider.level === 'Verificado' ? 'bg-green-bg text-green-dark' :
-            'bg-cream-mid text-tip-mid'
-          }`}>
-            {provider.level}
-          </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/provider/${provider.id}`) }}
+            style={{
+              fontSize: 9,
+              fontWeight: 600,
+              color: '#1E4D5C',
+              border: '1px solid #2E6E84',
+              borderRadius: 6,
+              padding: '3px 8px',
+              background: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Ver perfil
+          </button>
         </div>
       </div>
     </div>

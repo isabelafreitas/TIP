@@ -5,6 +5,7 @@ import { useToastStore } from '../store/toastStore'
 import { seedDemoData } from '../utils/seed'
 import Input from '../components/Input'
 import Button from '../components/Button'
+import { TipLogo } from '../App'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterScreen() {
@@ -50,18 +51,23 @@ export default function RegisterScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream">
-      <div className="bg-petroleum px-6 pt-16 pb-8">
-        <h1 className="text-white text-2xl font-bold">
-          {mode === 'login' ? 'Bem-vinda de volta!' : 'Crie sua conta'}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7' }}>
+      {/* Top */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <TipLogo size="sm" />
+      </div>
+
+      <div style={{ padding: '20px 20px 0' }}>
+        <h1 style={{ fontSize: 16, fontWeight: 700, color: '#1A1A18', marginBottom: 4 }}>
+          {mode === 'login' ? 'Bem-vinda de volta!' : 'Criar conta'}
         </h1>
-        <p className="text-petroleum-light text-sm mt-1">
+        <p style={{ fontSize: 11, color: '#6A6858' }}>
           {mode === 'login' ? 'Entre para acessar a TIP' : 'Junte-se à comunidade TIP'}
         </p>
       </div>
 
-      <div className="flex-1 px-6 py-8">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div style={{ flex: 1, padding: '20px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {mode === 'register' && (
             <Input
               label="Nome completo"
@@ -87,36 +93,46 @@ export default function RegisterScreen() {
             onChange={e => set('password', e.target.value)}
             error={errors.password}
             rightIcon={
-              <button type="button" onClick={() => setShowPw(!showPw)}>
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+              <button type="button" onClick={() => setShowPw(!showPw)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6A6858' }}>
+                {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             }
           />
-          <Button type="submit" variant="primary" size="lg" fullWidth loading={loading} className="mt-2">
+
+          <p style={{ fontSize: 10, color: '#6A6858', textAlign: 'center', lineHeight: 1.5 }}>
+            Ao continuar, você concorda com os{' '}
+            <span style={{ color: '#1E4D5C', fontWeight: 600 }}>Termos de Uso</span>{' '}
+            e{' '}
+            <span style={{ color: '#1E4D5C', fontWeight: 600 }}>Política de Privacidade</span>.
+          </p>
+
+          <Button type="submit" variant="primary" size="lg" fullWidth loading={loading}>
             {mode === 'login' ? 'Entrar' : 'Criar conta'}
           </Button>
         </form>
 
-        <div className="text-center mt-6">
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
           {mode === 'login' ? (
-            <p className="text-sm text-tip-mid">
+            <button
+              onClick={() => setMode('register')}
+              style={{ fontSize: 11, color: '#6A6858', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
               Não tem conta?{' '}
-              <button onClick={() => setMode('register')} className="text-petroleum font-semibold">
-                Cadastre-se
-              </button>
-            </p>
+              <span style={{ color: '#1E4D5C', fontWeight: 600 }}>Cadastre-se</span>
+            </button>
           ) : (
-            <p className="text-sm text-tip-mid">
-              Já tem conta?{' '}
-              <button onClick={() => setMode('login')} className="text-petroleum font-semibold">
-                Entrar
-              </button>
-            </p>
+            <button
+              onClick={() => setMode('login')}
+              style={{ fontSize: 11, color: '#6A6858', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Já tenho conta —{' '}
+              <span style={{ color: '#1E4D5C', fontWeight: 600 }}>entrar</span>
+            </button>
           )}
         </div>
 
-        <div className="mt-4 p-3 bg-petroleum-bg rounded-xl">
-          <p className="text-xs text-petroleum font-medium">Demo: isa@tip.com / tip2026</p>
+        <div style={{ marginTop: 16, padding: 10, background: '#EEF3F4', borderRadius: 10 }}>
+          <p style={{ fontSize: 10, color: '#1E4D5C', fontWeight: 500 }}>Demo: isa@tip.com / tip2026</p>
         </div>
       </div>
     </div>

@@ -16,7 +16,10 @@ export default function NavBar() {
   const isProvider = user?.is_provider
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] bg-white border-t border-cream-border flex z-40">
+    <div
+      style={{ background: '#fff', borderTop: '1px solid #E0DED6' }}
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[390px] flex z-40"
+    >
       {tabs.map(tab => {
         const path = isProvider && tab.providerPath ? tab.providerPath : tab.path
         const active = location.pathname === path || location.pathname === tab.path || (isProvider && location.pathname === tab.providerPath)
@@ -25,10 +28,22 @@ export default function NavBar() {
           <button
             key={tab.label}
             onClick={() => navigate(path)}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors
-              ${active ? 'text-petroleum' : 'text-tip-light'}`}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 3,
+              padding: '10px 0',
+              color: active ? '#1E4D5C' : '#B0A898',
+              fontSize: 8,
+              fontWeight: active ? 600 : 400,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
-            <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
+            <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
             {tab.label}
           </button>
         )

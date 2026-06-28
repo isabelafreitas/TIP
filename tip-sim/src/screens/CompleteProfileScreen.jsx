@@ -5,8 +5,6 @@ import { useToastStore } from '../store/toastStore'
 import Input from '../components/Input'
 import Textarea from '../components/Textarea'
 import Button from '../components/Button'
-import Avatar from '../components/Avatar'
-import { Camera } from 'lucide-react'
 
 export default function CompleteProfileScreen() {
   const navigate = useNavigate()
@@ -33,34 +31,53 @@ export default function CompleteProfileScreen() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream pb-6">
-      <div className="bg-petroleum px-6 pt-16 pb-6">
-        <h1 className="text-white text-xl font-bold">Complete seu perfil</h1>
-        <p className="text-petroleum-light text-sm mt-1">Quanto mais completo, mais confiança você transmite</p>
-        <div className="mt-4">
-          <div className="flex justify-between text-xs text-petroleum-light mb-1">
-            <span>Completude do perfil</span>
-            <span>{completion}%</span>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 28px)', background: '#FBFAF7', paddingBottom: 24 }}>
+      {/* Header */}
+      <div style={{ padding: '20px 20px 16px' }}>
+        <h1 style={{ fontSize: 16, fontWeight: 700, color: '#1A1A18', marginBottom: 4 }}>Seu perfil</h1>
+        <p style={{ fontSize: 11, color: '#6A6858' }}>3x mais chances de ser contratada com perfil completo</p>
+
+        {/* Progress bar */}
+        <div style={{ marginTop: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+            <span style={{ fontSize: 10, color: '#6A6858', fontWeight: 600 }}>{completion}%</span>
           </div>
-          <div className="h-2 bg-white/20 rounded-full">
+          <div style={{ height: 4, background: '#EEF3F4', borderRadius: 9999 }}>
             <div
-              className="h-2 bg-white rounded-full transition-all duration-500"
-              style={{ width: `${completion}%` }}
+              style={{
+                height: 4,
+                background: '#C8960A',
+                borderRadius: 9999,
+                width: `${completion}%`,
+                transition: 'width 0.4s',
+              }}
             />
           </div>
         </div>
       </div>
 
-      <div className="flex-1 px-6 py-6 flex flex-col gap-5">
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <Avatar initials={currentUser?.initials} photo={photo} size="xl" />
-            <label className="absolute bottom-0 right-0 bg-petroleum text-white rounded-full p-1.5 cursor-pointer">
-              <Camera size={14} />
-              <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
-            </label>
-          </div>
-          <p className="text-sm text-tip-mid">Adicionar foto de perfil</p>
+      <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Avatar */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            {photo ? (
+              <img src={photo} alt="foto" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '2px dashed #1E4D5C' }} />
+            ) : (
+              <div style={{
+                width: 80, height: 80, borderRadius: '50%',
+                border: '2px dashed #1E4D5C',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#EEF3F4',
+              }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1E4D5C" strokeWidth="1.5">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                </svg>
+              </div>
+            )}
+            <span style={{ fontSize: 11, color: '#1E4D5C', fontWeight: 600 }}>+ Adicionar foto</span>
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
+          </label>
         </div>
 
         <Input
@@ -84,9 +101,12 @@ export default function CompleteProfileScreen() {
         <Button variant="primary" size="lg" fullWidth onClick={handleSave}>
           Salvar perfil
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={() => navigate('/home')}>
+        <button
+          onClick={() => navigate('/home')}
+          style={{ fontSize: 12, color: '#6A6858', textAlign: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: '6px 0' }}
+        >
           Fazer depois
-        </Button>
+        </button>
       </div>
     </div>
   )

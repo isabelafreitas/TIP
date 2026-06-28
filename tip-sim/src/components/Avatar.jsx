@@ -1,21 +1,38 @@
 export default function Avatar({ name, initials, photo, size = 'md', className = '' }) {
   const sizes = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-16 h-16 text-xl',
-    xl: 'w-24 h-24 text-3xl',
+    sm: { wh: 32, text: 10 },
+    md: { wh: 40, text: 12 },
+    lg: { wh: 56, text: 16 },
+    xl: { wh: 88, text: 28 },
   }
+  const s = sizes[size] || sizes.md
   if (photo) {
     return (
       <img
         src={photo}
         alt={name || ''}
-        className={`${sizes[size]} rounded-full object-cover ${className}`}
+        style={{ width: s.wh, height: s.wh, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+        className={className}
       />
     )
   }
   return (
-    <div className={`${sizes[size]} rounded-full bg-petroleum flex items-center justify-center text-white font-bold flex-shrink-0 ${className}`}>
+    <div
+      style={{
+        width: s.wh,
+        height: s.wh,
+        borderRadius: '50%',
+        background: '#EEF3F4',
+        color: '#1E4D5C',
+        fontSize: s.text,
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+      className={className}
+    >
       {initials || (name ? name.slice(0, 2).toUpperCase() : '?')}
     </div>
   )
