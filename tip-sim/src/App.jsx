@@ -30,10 +30,39 @@ function PrivateRoute({ children }) {
   return isLoggedIn ? children : <Navigate to="/onboarding" replace />
 }
 
+// Phone status bar at the top of every screen
+function PhoneBar() {
+  return (
+    <div
+      style={{ background: '#1E4D5C', height: 28, flexShrink: 0 }}
+      className="w-full flex items-center justify-center"
+    >
+      <div
+        style={{ background: 'rgba(255,255,255,0.35)', width: 48, height: 6, borderRadius: 9999 }}
+      />
+    </div>
+  )
+}
+
+export function TipLogo({ size = 'md' }) {
+  const sizes = {
+    sm: 'text-base',
+    md: 'text-xl',
+    lg: 'text-2xl',
+  }
+  return (
+    <span className={`${sizes[size]} font-extrabold leading-none`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <span style={{ color: '#1E4D5C' }}>tip</span>
+      <span style={{ color: '#C8960A' }}>.</span>
+    </span>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Toast />
+      <PhoneBar />
       <Routes>
         <Route path="/onboarding" element={<OnboardingScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
