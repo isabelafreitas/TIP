@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - claude/mobile-app-browser-sim-4dm99n
-    paths:
-      - 'tip-sim/**'
   workflow_dispatch:
 
 permissions:
