@@ -42,7 +42,8 @@ export default function CompleteProfileScreen({ navigation }) {
     setSaving(true);
     setApiError('');
     try {
-      await updateUser({ photo_url: photo, bairro: bairro.trim(), bio: bio.trim() });
+      // photo_url not uploaded in dev (S3 stub) — save only text fields
+      await updateUser({ neighborhood: bairro.trim(), bio: bio.trim() });
       navigateHome();
     } catch (err) {
       setApiError(err.response?.data?.message || 'Erro ao salvar perfil.');
@@ -51,10 +52,11 @@ export default function CompleteProfileScreen({ navigation }) {
     }
   }
 
-  function navigateHome() {
-    // RootNavigator handles this based on user.is_provider
-    // We just reset navigation
-    navigation.reset({ index: 0, routes: [{ name: user?.is_provider ? 'ProviderHome' : 'Home' }] });
+  async function navigateHome() {
+    // User is already set in AuthContext after register.
+    // Calling updateUser with empty object triggers RootNavigator
+    // to re-evaluate and switch to RequesterStack automatically.
+    try { await updateUser({}); } catch (_) {}
   }
 
   return (

@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
         if (stored) {
           setToken(stored);
           const res = await api.get('/users/me');
-          setUser(res.data);
+          setUser(res.data.data || res.data);
         }
       } catch {
         await AsyncStorage.removeItem('token');
@@ -30,7 +30,9 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     const res = await api.post('/auth/login', { email, password });
-    const { token: t, user: u } = res.data;
+    const d = res.data.data || res.data;
+    const t = d.token || res.data.token;
+    const u = d.user || d;
     await AsyncStorage.setItem('token', t);
     setToken(t);
     setUser(u);
@@ -39,7 +41,9 @@ export function AuthProvider({ children }) {
 
   async function register(name, email, password) {
     const res = await api.post('/auth/register', { name, email, password });
-    const { token: t, user: u } = res.data;
+    const d = res.data.data || res.data;
+    const t = d.token || res.data.token;
+    const u = d.user || d;
     await AsyncStorage.setItem('token', t);
     setToken(t);
     setUser(u);
@@ -54,8 +58,9 @@ export function AuthProvider({ children }) {
 
   async function updateUser(data) {
     const res = await api.patch('/users/me', data);
-    setUser(res.data);
-    return res.data;
+    const u = res.data.data || res.data;
+    setUser(u);
+    return u;
   }
 
   return (
